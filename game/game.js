@@ -73,9 +73,9 @@ function copy(grid){
 }
 // These functions will be used to calculate the score  of the grid.
 //The score for the moves
-function score(board, cof, colNo, marker){
+function score(board1, cof, colNo, marker){
 
-    var board_copy = {...board};
+    var board_copy = {...board1};
     board_copy.grid = add_coin_temp(board_copy.grid ,cof, colNo, marker);
     var complete4 = no_of_coins(board_copy.grid, marker, cof, 4);
     var count_3 = no_of_coins(board_copy.grid, marker, 3);
@@ -173,18 +173,18 @@ function add_coin_temp(grid, cof, add_col, marker)
 }
 
 // The next move
-function next_move_score(board, cof, marker){
+function next_move_score(board1, cof, marker){
     var move_list = [];
     for(let i = 0; i< cof.columns; i++){
-        if(board.grid[0][i]==0)
+        if(board1.grid[0][i]==0)
             move_list.push(i+1);
     }
     var score_list = [];
     if(move_list.length != 0){
         for(let i=0; i<move_list.length; i++){
             
-            alert(board.grid);
-            let n = score(board, cof, move_list[i], marker);
+            alert(board1.grid);
+            let n = score(board1, cof, move_list[i], marker);
             score_list.push(n);
         }
         var max_score = 0;
@@ -196,14 +196,14 @@ function next_move_score(board, cof, marker){
                 n = move_list[i];
             }
         }
-        add_coin(board, cof, marker, n);
+        add_coin(board1, cof, marker, n);
     }
     return n;
 }
 
 // This function checks wether the board has a winning postion or not
-function checkWin(board, cof, marker){
-    var grid = board.grid;
+function checkWin(board1, cof, marker){
+    var grid = board1.grid;
     //Horizontal Check
     for (let i = 0; i < cof.rows; i++){
         for (let j = 0; j < cof.columns - cof.inArow + 1; j++){
@@ -269,8 +269,8 @@ function checkWin(board, cof, marker){
 }
 
 //Add the coin to the board from the user
-function add_coin(board, cof, marker, add_col){
-    grid = board.grid;
+function add_coin(board1, cof, marker, add_col){
+    grid = board1.grid;
     for(let i = cof.rows-1; i>=0; i--){
         if(grid[i][add_col - 1] == 0){
             grid[i][add_col - 1] = marker;
@@ -281,37 +281,37 @@ function add_coin(board, cof, marker, add_col){
     return false;
 }
 //Add coin by the computer
-function next_move(board, cof, marker){
+function next_move(board1, cof, marker){
     var move_list = [];
     for(let i = 0; i< cof.columns; i++){
-        if(board.grid[0][i]==0)
+        if(board1.grid[0][i]==0)
             move_list.push(i);
     }
 
     if(move_list.length != 0){
         var n = random(move_list) + 1;
-        add_coin(board, cof, marker, n);
+        add_coin(board1, cof, marker, n);
     }
 
     return n;
 }
+
 var cof = {
     columns: 7,
     rows : 6,
     inArow: 4
 };
 
-grid = createGrid();
 
 var board = {
-    grid : grid,
+    grid : createGrid(),
     mark1 : 1,
     mark2 : 2
 }
 
 function setup(){
     currentTurn = currentTurn + 1;
-    draw(grid, cof); 
+    draw(board.grid, cof); 
     if(checkWin(board, cof, 1)){
         if(confirm("You won!! New Game?"))
             location.reload();
