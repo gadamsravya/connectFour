@@ -7,6 +7,7 @@ parentStyle.textAlign = "center";
 
 currentTurn = 1;
 
+
 function createGrid(){
     let newGrid = [
         [0, 0, 0, 0, 0, 0, 0],
@@ -68,21 +69,28 @@ function draw(grid, cof) {
     }
 }
 
-function copy(grid){
-    return grid1 = grid;
+function clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
 }
 // These functions will be used to calculate the score  of the grid.
 //The score for the moves
 function score(board1, cof, colNo, marker){
 
-    var board_copy = {...board1};
-    board_copy.grid = add_coin_temp(board_copy.grid ,cof, colNo, marker);
+    var board_copy = board1;
+    var row = add_coin_temp(board_copy.grid ,cof, colNo, marker);
     var complete4 = no_of_coins(board_copy.grid, marker, cof, 4);
     var count_3 = no_of_coins(board_copy.grid, marker, 3);
-    var count_3_op = no_of_coins(board_copy.grid, marker%2 + 1, 3);
-    var complete4_op = no_of_coins(board_copy.grid, marker%2 + 1, 4);
-
-    return complete4*1000000 + count_3*1000 - count_3_op*100 - complete4_op*100000;
+    var count_3_op = no_of_coins(board_copy.grid, marker%2 + 1, 2);
+    var complete4_op = no_of_coins(board_copy.grid, marker%2 + 1, 3);
+    
+    var score = complete4*1000000 + count_3*1000 - count_3_op*100 - complete4_op*100000;
+    
+    return score;
 }
 // The number coins of each move
 function no_of_coins(grid, marker, cof, no_coin){
@@ -167,9 +175,25 @@ function add_coin_temp(grid, cof, add_col, marker)
         if(grid[i][add_col - 1] == 0){
             grid[i][add_col - 1] = marker;
             break;
+            
         }
     }
     return grid;
+}
+
+function remove_old_coin_in_col(board1, cof, marker, colNo){
+        for(let j = 0; j < cof.rows; j++){
+            if(board1.grid[j][colNo-1] == marker){
+                board1.grid[j][colNo-1] = 0;
+                break;
+            }
+        }
+}
+
+function remove_old_coin(board1, cof, marker, move_list){
+    for(let i = 0; i <= move_list.length; i++){
+        remove_old_coin_in_col(board1,cof,marker, move_list[i]);
+    }
 }
 
 // The next move
@@ -183,10 +207,11 @@ function next_move_score(board1, cof, marker){
     if(move_list.length != 0){
         for(let i=0; i<move_list.length; i++){
             
-            alert(board1.grid);
             let n = score(board1, cof, move_list[i], marker);
             score_list.push(n);
         }
+
+   
         var max_score = 0;
         var n;
         for(let i=0; i<score_list.length; i++){
@@ -196,6 +221,7 @@ function next_move_score(board1, cof, marker){
                 n = move_list[i];
             }
         }
+        remove_old_coin(board1,cof, marker,move_list);
         add_coin(board1, cof, marker, n);
     }
     return n;
